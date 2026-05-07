@@ -2,23 +2,29 @@
 AdminPanel/vendor/
 AdminPanel/.env
 AdminPanel/node_modules/
-AdminPanel/storage/app/public/*
-AdminPanel/storage/logs/*
-AdminPanel/bootstrap/cache/*
+AdminPanel/storage/framework/views/
+AdminPanel/storage/framework/cache/
+AdminPanel/storage/framework/sessions/
+AdminPanel/storage/logs/
+AdminPanel/bootstrap/cache/
+AdminPanel/database/database.sqlite
+AdminPanel/public/hot
 
 # Mobile (React Native / Expo)
 Mobile/node_modules/
 Mobile/.expo/
 Mobile/dist/
-Mobile/android/
+Mobile/android/build/
+Mobile/android/app/build/
+Mobile/android/.gradle/
 Mobile/ios/
 Mobile/*.jks
 Mobile/*.p8
 Mobile/*.p12
 Mobile/*.key
 Mobile/*.mobileprovision
-Mobile/.env
 
 # OS
 .DS_Store
 Thumbs.db
+*.log
