@@ -1,0 +1,24 @@
+# AdminPanel (Laravel)
+AdminPanel/vendor/
+AdminPanel/.env
+AdminPanel/node_modules/
+AdminPanel/storage/app/public/*
+AdminPanel/storage/logs/*
+AdminPanel/bootstrap/cache/*
+
+# Mobile (React Native / Expo)
+Mobile/node_modules/
+Mobile/.expo/
+Mobile/dist/
+Mobile/android/
+Mobile/ios/
+Mobile/*.jks
+Mobile/*.p8
+Mobile/*.p12
+Mobile/*.key
+Mobile/*.mobileprovision
+Mobile/.env
+
+# OS
+.DS_Store
+Thumbs.db
