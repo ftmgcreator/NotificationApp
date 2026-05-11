@@ -25,7 +25,7 @@ class ProcessWorkJob implements ShouldQueue
             $records = $phoneNumbers->map(fn ($phone) => [
                 'work_id'         => $this->work->id,
                 'phone_number_id' => $phone->id,
-                'status'          => 'pending',
+                'status'          => 'created',
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ])->toArray();
@@ -35,7 +35,7 @@ class ProcessWorkJob implements ShouldQueue
             $records = $phoneNumbers->map(fn ($phone) => [
                 'work_id'         => $this->work->id,
                 'phone_number_id' => $phone->id,
-                'status'          => 'pending',
+                'status'          => 'created',
                 'created_at'      => now(),
                 'updated_at'      => now(),
             ])->toArray();

@@ -15,8 +15,8 @@ class WorkerController extends Controller
 {
     public function current(): JsonResponse
     {
-        $work = Work::whereHas('smsList', fn ($q) => $q->where('status', 'pending'))
-            ->orWhereHas('calls', fn ($q) => $q->where('status', 'pending'))
+        $work = Work::whereHas('smsList', fn ($q) => $q->where('status', 'created'))
+            ->orWhereHas('calls', fn ($q) => $q->where('status', 'created'))
             ->latest()
             ->first();
 
@@ -29,8 +29,8 @@ class WorkerController extends Controller
             : $work->calls()->count();
 
         $pending = $work->type === 'sms'
-            ? $work->smsList()->where('status', 'pending')->count()
-            : $work->calls()->where('status', 'pending')->count();
+            ? $work->smsList()->where('status', 'created')->count()
+            : $work->calls()->where('status', 'created')->count();
 
         return response()->json([
             'work' => [
@@ -45,7 +45,7 @@ class WorkerController extends Controller
             ],
             'stats' => [
                 'total'   => $total,
-                'pending' => $pending,
+                'created' => $pending,
                 'done'    => $total - $pending,
             ],
         ]);
@@ -61,7 +61,7 @@ class WorkerController extends Controller
         if ($work->type === 'sms') {
             $items = Sms::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->where('status', 'pending')
+                ->where('status', 'created')
                 ->offset($offset)
                 ->limit($limit)
                 ->get()
@@ -70,11 +70,11 @@ class WorkerController extends Controller
                     'phone_number' => $s->phoneNumber?->phone_number,
                 ]);
 
-            $total = Sms::where('work_id', $workId)->where('status', 'pending')->count();
+            $total = Sms::where('work_id', $workId)->where('status', 'created')->count();
         } else {
             $items = Call::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->where('status', 'pending')
+                ->where('status', 'created')
                 ->offset($offset)
                 ->limit($limit)
                 ->get()
@@ -83,7 +83,7 @@ class WorkerController extends Controller
                     'phone_number' => $c->phoneNumber?->phone_number,
                 ]);
 
-            $total = Call::where('work_id', $workId)->where('status', 'pending')->count();
+            $total = Call::where('work_id', $workId)->where('status', 'created')->count();
         }
 
         return response()->json([

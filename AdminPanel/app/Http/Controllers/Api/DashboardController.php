@@ -16,7 +16,7 @@ class DashboardController extends Controller
         $callsMade  = Call::whereDate('created_at', today())->where('status', 'called')->count();
         $smsFailed  = Sms::whereDate('created_at', today())->where('status', 'failed')->count();
         $callFailed = Call::whereDate('created_at', today())->where('status', 'failed')->count();
-        $smsPending = Sms::where('status', 'pending')->count();
+        $smsPending = Sms::where('status', 'created')->count();
         $retries    = Sms::where('status', 'failed')->count() + Call::where('status', 'failed')->count();
 
         $smsActivity = Sms::with('phoneNumber')
@@ -53,7 +53,7 @@ class DashboardController extends Controller
                 'sms_sent'   => $smsSent,
                 'calls_made' => $callsMade,
                 'failed'     => $smsFailed + $callFailed,
-                'pending'    => $smsPending,
+                'created'    => $smsPending,
                 'retries'    => $retries,
             ],
             'activity' => $activity,

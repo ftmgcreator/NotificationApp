@@ -15,7 +15,7 @@ return new class extends Migration
             $table->id();
             $table->foreignId('work_id')->constrained()->cascadeOnDelete();
             $table->foreignId('phone_number_id')->constrained()->cascadeOnDelete();
-            $table->enum('status', ['pending', 'called', 'failed'])->default('pending');
+            $table->enum('status', ['created', 'called', 'failed'])->default('created');
             $table->timestamps();
         });
     }
