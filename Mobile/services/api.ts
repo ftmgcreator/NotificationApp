@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
 
-export const API_URL = 'http://192.168.148.151:8080/api';
+export const API_URL = 'https://push.mtaxi.uz/api';
 
 const api = axios.create({
     baseURL: API_URL,
