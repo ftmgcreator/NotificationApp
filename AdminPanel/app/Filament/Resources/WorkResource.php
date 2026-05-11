@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\WorkResource\Pages;
+use App\Filament\Resources\WorkResource\RelationManagers;
 use App\Models\Category;
 use App\Models\Work;
 use Filament\Forms;
@@ -116,6 +117,14 @@ class WorkResource extends Resource
                     Tables\Actions\DeleteBulkAction::make()->label('O\'chirish'),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\SmsListRelationManager::class,
+            RelationManagers\CallsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array
