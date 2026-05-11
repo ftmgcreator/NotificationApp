@@ -22,7 +22,7 @@ class Work extends Model
 
     protected static function booted(): void
     {
-        static::created(fn (Work $work) => ProcessWorkJob::dispatch($work));
+        static::created(fn (Work $work) => ProcessWorkJob::dispatchSync($work));
     }
 
     public function category()

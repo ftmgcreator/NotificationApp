@@ -185,4 +185,6 @@
     }
 
     @keyframes wf-spin { to { transform: rotate(360deg); } }
+
+    .wf-relations { margin-top: 32px; }
 </style>

@@ -24,5 +24,16 @@
 
     <x-filament-actions::modals />
 
+    @if (count($relationManagers = $this->getRelationManagers()))
+        <div class="wf-relations">
+            <x-filament-panels::resources.relation-managers
+                :active-locale="$this->activeLocale ?? null"
+                :managers="$relationManagers"
+                :owner-record="$this->getRecord()"
+                :page-class="static::class"
+            />
+        </div>
+    @endif
+
     @include('filament.resources.work-resource.pages._work-styles')
 </x-filament-panels::page>
