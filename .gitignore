@@ -28,3 +28,8 @@ Mobile/*.mobileprovision
 .DS_Store
 Thumbs.db
 *.log
+
+# IDE & internal
+.claude/
+.idea/
+Mobile/.idea/
