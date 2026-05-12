@@ -35,4 +35,14 @@ class PhoneNumber extends Model
     {
         return $this->belongsTo(Category::class);
     }
+
+    public function smsList()
+    {
+        return $this->hasMany(Sms::class);
+    }
+
+    public function calls()
+    {
+        return $this->hasMany(Call::class);
+    }
 }

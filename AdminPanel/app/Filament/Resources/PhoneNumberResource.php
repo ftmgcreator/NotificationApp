@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PhoneNumberResource\Pages;
+use App\Filament\Resources\PhoneNumberResource\RelationManagers;
 use App\Models\Category;
 use App\Models\PhoneNumber;
 use Filament\Forms;
@@ -98,6 +99,14 @@ class PhoneNumberResource extends Resource
                     Tables\Actions\DeleteBulkAction::make()->label('O\'chirish'),
                 ]),
             ]);
+    }
+
+    public static function getRelations(): array
+    {
+        return [
+            RelationManagers\SmsListRelationManager::class,
+            RelationManagers\CallsRelationManager::class,
+        ];
     }
 
     public static function getPages(): array

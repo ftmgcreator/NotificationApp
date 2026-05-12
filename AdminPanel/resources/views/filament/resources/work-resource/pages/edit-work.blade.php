@@ -27,7 +27,7 @@
     @if (count($relationManagers = $this->getRelationManagers()))
         <div class="wf-relations">
             <x-filament-panels::resources.relation-managers
-                :active-locale="$this->activeLocale ?? null"
+                :active-manager="$this->activeRelationManager"
                 :managers="$relationManagers"
                 :owner-record="$this->getRecord()"
                 :page-class="static::class"

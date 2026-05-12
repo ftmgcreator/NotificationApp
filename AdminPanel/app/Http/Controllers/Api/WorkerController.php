@@ -53,43 +53,45 @@ class WorkerController extends Controller
 
     public function numbers(int $workId, Request $request): JsonResponse
     {
-        $limit  = min((int) $request->query('limit', 30), 100);
-        $offset = (int) $request->query('offset', 0);
-
-        $work = Work::findOrFail($workId);
+        $limit = min((int) $request->query('limit', 30), 100);
+        $work  = Work::findOrFail($workId);
 
         if ($work->type === 'sms') {
-            $items = Sms::with('phoneNumber')
+            $records = Sms::with('phoneNumber')
                 ->where('work_id', $workId)
                 ->where('status', 'created')
-                ->offset($offset)
                 ->limit($limit)
-                ->get()
-                ->map(fn ($s) => [
-                    'sms_id'       => $s->id,
-                    'phone_number' => $s->phoneNumber?->phone_number,
-                ]);
+                ->get();
 
-            $total = Sms::where('work_id', $workId)->where('status', 'created')->count();
+            Sms::whereIn('id', $records->pluck('id'))->update(['status' => 'pending']);
+
+            $items = $records->map(fn ($s) => [
+                'sms_id'       => $s->id,
+                'phone_number' => $s->phoneNumber?->phone_number,
+            ]);
+
+            $remaining = Sms::where('work_id', $workId)->where('status', 'created')->count();
         } else {
-            $items = Call::with('phoneNumber')
+            $records = Call::with('phoneNumber')
                 ->where('work_id', $workId)
                 ->where('status', 'created')
-                ->offset($offset)
                 ->limit($limit)
-                ->get()
-                ->map(fn ($c) => [
-                    'call_id'      => $c->id,
-                    'phone_number' => $c->phoneNumber?->phone_number,
-                ]);
+                ->get();
 
-            $total = Call::where('work_id', $workId)->where('status', 'created')->count();
+            Call::whereIn('id', $records->pluck('id'))->update(['status' => 'pending']);
+
+            $items = $records->map(fn ($c) => [
+                'call_id'      => $c->id,
+                'phone_number' => $c->phoneNumber?->phone_number,
+            ]);
+
+            $remaining = Call::where('work_id', $workId)->where('status', 'created')->count();
         }
 
         return response()->json([
             'items'    => $items,
-            'total'    => $total,
-            'has_more' => ($offset + $limit) < $total,
+            'total'    => $items->count(),
+            'has_more' => $remaining > 0,
         ]);
     }
 
