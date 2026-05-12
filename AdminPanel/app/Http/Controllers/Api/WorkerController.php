@@ -15,8 +15,8 @@ class WorkerController extends Controller
 {
     public function current(): JsonResponse
     {
-        $work = Work::whereHas('smsList', fn ($q) => $q->where('status', 'created'))
-            ->orWhereHas('calls', fn ($q) => $q->where('status', 'created'))
+        $work = Work::whereHas('smsList', fn ($q) => $q->whereIn('status', ['created', 'pending']))
+            ->orWhereHas('calls', fn ($q) => $q->whereIn('status', ['created', 'pending']))
             ->latest()
             ->first();
 
@@ -24,13 +24,13 @@ class WorkerController extends Controller
             return response()->json(['work' => null]);
         }
 
-        $total   = $work->type === 'sms'
+        $total = $work->type === 'sms'
             ? $work->smsList()->count()
             : $work->calls()->count();
 
         $pending = $work->type === 'sms'
-            ? $work->smsList()->where('status', 'created')->count()
-            : $work->calls()->where('status', 'created')->count();
+            ? $work->smsList()->whereIn('status', ['created', 'pending'])->count()
+            : $work->calls()->whereIn('status', ['created', 'pending'])->count();
 
         return response()->json([
             'work' => [
@@ -45,7 +45,7 @@ class WorkerController extends Controller
             ],
             'stats' => [
                 'total'   => $total,
-                'created' => $pending,
+                'pending' => $pending,
                 'done'    => $total - $pending,
             ],
         ]);
