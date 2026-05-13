@@ -1,7 +1,7 @@
 import { Ionicons } from '@expo/vector-icons';
 import * as FileSystem from 'expo-file-system';
 import { useEffect, useRef, useState } from 'react';
-import { Animated, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Animated, PermissionsAndroid, Platform, StatusBar, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { Circle, Svg } from 'react-native-svg';
 import { callModule, CallState } from '../modules/callModule';
 import { smsModule } from '../modules/smsModule';
@@ -165,10 +165,17 @@ export default function WorkerScreen() {
     async function processSms(item: PhoneItem, message: string): Promise<'sent' | 'failed'> {
         animateIn(item.phone_number);
         try {
-            const ok = await smsModule.sendSms(item.phone_number, message);
+            const timeoutPromise = new Promise<boolean>((_, reject) =>
+                setTimeout(() => reject(new Error('SMS timeout')), 15000)
+            );
+            const ok = await Promise.race([
+                smsModule.sendSms(item.phone_number, message),
+                timeoutPromise,
+            ]);
             await animateOut();
             return ok ? 'sent' : 'failed';
-        } catch {
+        } catch (e) {
+            console.warn('SMS error:', e);
             await animateOut();
             return 'failed';
         }
@@ -244,8 +251,30 @@ export default function WorkerScreen() {
         }
     }
 
-    const toggle = () => {
+    async function ensurePermissions(): Promise<boolean> {
+        if (Platform.OS !== 'android') return true;
+        try {
+            const result = await PermissionsAndroid.requestMultiple([
+                PermissionsAndroid.PERMISSIONS.SEND_SMS,
+                PermissionsAndroid.PERMISSIONS.CALL_PHONE,
+                PermissionsAndroid.PERMISSIONS.READ_PHONE_STATE,
+            ]);
+            const smsOk  = result['android.permission.SEND_SMS'] === 'granted';
+            const callOk = result['android.permission.CALL_PHONE'] === 'granted';
+            if (!smsOk && !callOk) {
+                Alert.alert('Ruxsat kerak', 'SMS yuborish yoki qo\'ng\'iroq qilish uchun ruxsat bering. Sozlamalar bo\'limidan tekshiring.');
+                return false;
+            }
+            return true;
+        } catch { return false; }
+    }
+
+    const toggle = async () => {
         const next = !running;
+        if (next) {
+            const ok = await ensurePermissions();
+            if (!ok) return;
+        }
         runningRef.current = next;
         setRunning(next);
         if (!next) { setStatusLabel('To\'xtatildi'); setCallState(null); }

@@ -59,7 +59,7 @@ class WorkerController extends Controller
         if ($work->type === 'sms') {
             $records = Sms::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->where('status', 'created')
+                ->whereIn('status', ['created', 'pending'])
                 ->limit($limit)
                 ->get();
 
@@ -70,11 +70,14 @@ class WorkerController extends Controller
                 'phone_number' => $s->phoneNumber?->phone_number,
             ]);
 
-            $remaining = Sms::where('work_id', $workId)->where('status', 'created')->count();
+            $remaining = Sms::where('work_id', $workId)
+                ->whereIn('status', ['created', 'pending'])
+                ->whereNotIn('id', $records->pluck('id'))
+                ->count();
         } else {
             $records = Call::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->where('status', 'created')
+                ->whereIn('status', ['created', 'pending'])
                 ->limit($limit)
                 ->get();
 
@@ -85,7 +88,10 @@ class WorkerController extends Controller
                 'phone_number' => $c->phoneNumber?->phone_number,
             ]);
 
-            $remaining = Call::where('work_id', $workId)->where('status', 'created')->count();
+            $remaining = Call::where('work_id', $workId)
+                ->whereIn('status', ['created', 'pending'])
+                ->whereNotIn('id', $records->pluck('id'))
+                ->count();
         }
 
         return response()->json([
