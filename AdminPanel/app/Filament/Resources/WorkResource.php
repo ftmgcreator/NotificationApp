@@ -91,6 +91,30 @@ class WorkResource extends Resource
                     ->label('Kategoriya')
                     ->badge(),
 
+                Tables\Columns\TextColumn::make('progress')
+                    ->label('Bajarildi')
+                    ->badge()
+                    ->getStateUsing(function ($record) {
+                        $relation = $record->type === 'sms' ? 'smsList' : 'calls';
+                        $total    = $record->{$relation}()->count();
+                        $done     = $record->{$relation}()
+                            ->whereNotIn('status', ['created', 'pending'])
+                            ->count();
+                        $percent  = $total > 0 ? round($done / $total * 100) : 0;
+                        return "{$done}/{$total} ({$percent}%)";
+                    })
+                    ->color(function ($record) {
+                        $relation = $record->type === 'sms' ? 'smsList' : 'calls';
+                        $total    = $record->{$relation}()->count();
+                        $done     = $record->{$relation}()
+                            ->whereNotIn('status', ['created', 'pending'])
+                            ->count();
+                        if ($total === 0)        return 'gray';
+                        if ($done === $total)    return 'success';
+                        if ($done === 0)         return 'warning';
+                        return 'info';
+                    }),
+
                 Tables\Columns\TextColumn::make('scheduled_at')
                     ->label('Rejalashtirilgan')
                     ->dateTime('d.m.Y H:i')
