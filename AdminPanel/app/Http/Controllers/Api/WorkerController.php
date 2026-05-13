@@ -15,8 +15,8 @@ class WorkerController extends Controller
 {
     public function current(): JsonResponse
     {
-        $work = Work::whereHas('smsList', fn ($q) => $q->whereIn('status', ['created', 'pending']))
-            ->orWhereHas('calls', fn ($q) => $q->whereIn('status', ['created', 'pending']))
+        $work = Work::whereHas('smsList', fn ($q) => $q->where('status', 'created'))
+            ->orWhereHas('calls', fn ($q) => $q->where('status', 'created'))
             ->latest()
             ->first();
 
@@ -29,8 +29,8 @@ class WorkerController extends Controller
             : $work->calls()->count();
 
         $pending = $work->type === 'sms'
-            ? $work->smsList()->whereIn('status', ['created', 'pending'])->count()
-            : $work->calls()->whereIn('status', ['created', 'pending'])->count();
+            ? $work->smsList()->where('status', 'created')->count()
+            : $work->calls()->where('status', 'created')->count();
 
         return response()->json([
             'work' => [
@@ -59,7 +59,7 @@ class WorkerController extends Controller
         if ($work->type === 'sms') {
             $records = Sms::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->whereIn('status', ['created', 'pending'])
+                ->where('status', 'created')
                 ->limit($limit)
                 ->get();
 
@@ -71,13 +71,12 @@ class WorkerController extends Controller
             ]);
 
             $remaining = Sms::where('work_id', $workId)
-                ->whereIn('status', ['created', 'pending'])
-                ->whereNotIn('id', $records->pluck('id'))
+                ->where('status', 'created')
                 ->count();
         } else {
             $records = Call::with('phoneNumber')
                 ->where('work_id', $workId)
-                ->whereIn('status', ['created', 'pending'])
+                ->where('status', 'created')
                 ->limit($limit)
                 ->get();
 
@@ -89,8 +88,7 @@ class WorkerController extends Controller
             ]);
 
             $remaining = Call::where('work_id', $workId)
-                ->whereIn('status', ['created', 'pending'])
-                ->whereNotIn('id', $records->pluck('id'))
+                ->where('status', 'created')
                 ->count();
         }
 
